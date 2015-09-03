@@ -69,6 +69,47 @@ switch ($method) {
                     json_return(400, "Bad Request", NULL);
                 }
             }
+        } elseif ($task == "add_time") {
+            $date = trim($_POST['date']);
+            $time = trim($_POST['time']);
+            $distance = trim($_POST['distance']);
+            if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0) {
+                json_return(400, "Bad Request", NULL);
+            } else {
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
+                    if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                        $main = new Main();
+                        $main->addTime($date, $time, $distance);
+                    } else {
+                        json_return(400, "Bad Request", NULL);
+                    }
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            }
+        } elseif ($task == "edit_time") {
+            $date = trim($_POST['date']);
+            $time = trim($_POST['time']);
+            $distance = trim($_POST['distance']);
+            $time_id = trim($_POST['time_id']);
+            if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0 || strlen($time_id) <= 0) {
+                json_return(400, "Bad Request", NULL);
+            } else {
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
+                    if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                        $main = new Main();
+                        $main->editTime($date, $time, $distance, $time_id);
+                    } else {
+                        json_return(400, "Bad Request", NULL);
+                    }
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            }
         } else {
             json_return(400, "Invalid Request", NULL);
         }
