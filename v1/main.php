@@ -27,7 +27,6 @@ class Main {
             $api_key = getAPIKey();
             $sql = "INSERT INTO `users` (`email`, `pass`, `level`, `api_key`) VALUES ('$email', '$hash', '$level', '$api_key')";
             $query = mysqli_query($this->conn, $sql);
-            echo mysqli_error($this->conn);
             if ($query) {
                 $_SESSION['user_id'] = mysqli_insert_id($this->conn);
                 $_SESSION['level'] = $level;
@@ -89,6 +88,20 @@ class Main {
             json_return(200, "Time Deleted Succeeded", NULL);
         } else {
             json_return(400, "Connot Find This Record", NULL);
+        }
+    }
+
+    public function addTime($date, $time, $distance) {
+        $date = mysqli_real_escape_string($this->conn, $date);
+        $time = mysqli_real_escape_string($this->conn, $time);
+        $distance = mysqli_real_escape_string($this->conn, $distance);
+        $user_id = mysqli_real_escape_string($this->conn, $_SESSION['user_id']);
+        $sql = "INSERT INTO `times` (`user_id`, `date`, `time`, `distance`) VALUES ('$user_id', '$date', '$time', '$distance')";
+        $query = mysqli_query($this->conn, $sql);
+        if ($query) {
+            json_return(200, "Record Added Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
+        } else {
+            json_return(400, "Something Went Wrong", NULL);
         }
     }
 
