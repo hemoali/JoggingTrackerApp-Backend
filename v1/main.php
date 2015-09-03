@@ -41,7 +41,6 @@ class Main {
     }
 
     function login($email, $pass) {
-
         $email = mysqli_real_escape_string($this->conn, $email);
         $pass = mysqli_real_escape_string($this->conn, $pass);
         $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
