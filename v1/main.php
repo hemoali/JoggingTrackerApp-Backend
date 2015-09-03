@@ -24,14 +24,16 @@ class Main {
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (mysqli_num_rows($query) <= 0) {
             $hash = getHashed($pass);
-            $sql = "INSERT INTO `users` (`email`, `pass`, `level`) VALUES ('$email', '$hash', '$level')";
+            $api_key = getAPIKey();
+            $sql = "INSERT INTO `users` (`email`, `pass`, `level`, `api_key`) VALUES ('$email', '$hash', '$level', '$api_key')";
             $query = mysqli_query($this->conn, $sql);
             echo mysqli_error($this->conn);
             if ($query) {
                 $_SESSION['user_id'] = mysqli_insert_id($this->conn);
                 $_SESSION['level'] = $level;
                 $_SESSION['email'] = $email;
-                json_return(200, "Signup Succeeded", array("session_id" => session_id()));
+                $_SESSION['api_key'] = $api_key;
+                json_return(200, "Signup Succeeded", array("session_id" => session_id(), "api_key" => $api_key));
             } else {
                 json_return(400, "Something Went Wrong", NULL);
             }
@@ -51,7 +53,8 @@ class Main {
                 $_SESSION['user_id'] = $row['_id'];
                 $_SESSION['level'] = $row['level'];
                 $_SESSION['email'] = $email;
-                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level']));
+                $_SESSION['api_key'] = $row['api_key'];
+                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key']));
             } else {
                 json_return(200, "Invalid Password", NULL);
             }
