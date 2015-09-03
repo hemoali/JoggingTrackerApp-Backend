@@ -81,4 +81,15 @@ class Main {
         json_return(200, "Times Read Succeeded", $results);
     }
 
+    public function deleteTime($time_id) {
+        $time_id = mysqli_real_escape_string($this->conn, $time_id);
+        $sql = "DELETE FROM `times` WHERE `_id` = '$time_id'";
+        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        if ($query) {
+            json_return(200, "Time Deleted Succeeded", NULL);
+        } else {
+            json_return(400, "Connot Find This Record", NULL);
+        }
+    }
+
 }

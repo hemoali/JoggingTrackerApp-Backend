@@ -38,11 +38,45 @@ switch ($method) {
                     json_return(400, "Invalid Email", NULL);
                 }
             }
+        } elseif ($task == "getTimes") {
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
+                if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                    $main = new Main();
+                    $main->getTimes();
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            } else {
+                json_return(400, "Bad Request", NULL);
+            }
+        } elseif ($task == "delete_time") {
+            $time_id = trim($_POST['time_id']);
+            if (strlen($time_id) <= 0) {
+                json_return(400, "Bad Request", NULL);
+            } else {
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
+                    if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                        $main = new Main();
+                        $main->deleteTime($time_id);
+                    } else {
+                        json_return(400, "Bad Request", NULL);
+                    }
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            }
+        } else {
+            json_return(400, "Invalid Request", NULL);
         }
         break;
     case 'GET':
         break;
     case 'DELETE':
+
         break;
     default:
         json_return(400, "Invalid Request", NULL);
