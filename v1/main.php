@@ -85,7 +85,7 @@ class Main {
         $sql = "DELETE FROM `times` WHERE `_id` = '$time_id'";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if ($query) {
-            json_return(200, "Time Deleted Succeeded", NULL);
+            json_return(200, "Time Delete Succeeded", NULL);
         } else {
             json_return(400, "Connot Find This Record", NULL);
         }
@@ -99,7 +99,23 @@ class Main {
         $sql = "INSERT INTO `times` (`user_id`, `date`, `time`, `distance`) VALUES ('$user_id', '$date', '$time', '$distance')";
         $query = mysqli_query($this->conn, $sql);
         if ($query) {
-            json_return(200, "Record Added Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
+            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
+        } else {
+            json_return(400, "Something Went Wrong", NULL);
+        }
+    }
+
+    public function editTime($date, $time, $distance, $time_id) {
+        $time_id = mysqli_real_escape_string($this->conn, $time_id);
+        $date = mysqli_real_escape_string($this->conn, $date);
+        $time = mysqli_real_escape_string($this->conn, $time);
+        $distance = mysqli_real_escape_string($this->conn, $distance);
+        $user_id = mysqli_real_escape_string($this->conn, $_SESSION['user_id']);
+
+        $sql = "UPDATE `times` SET `time` = '$time', `date` = '$date', `distance` = '$distance' WHERE `_id` = '$time_id'";
+        $query = mysqli_query($this->conn, $sql);
+        if ($query) {
+            json_return(200, "Record Update Succeeded", NULL);
         } else {
             json_return(400, "Something Went Wrong", NULL);
         }
