@@ -63,4 +63,22 @@ class Main {
         }
     }
 
+    function getTimes() {
+        $user_id = $_SESSION['user_id'];
+        $results = array();
+        $sql = "SELECT * FROM `times` WHERE `user_id` = '$user_id' ORDER BY `_id` DESC";
+        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+
+        while ($row = mysqli_fetch_array($query)) {
+            $results[] = array(
+                'id' => $row['_id'],
+                'user_id' => $row['user_id'],
+                'date' => $row['date'],
+                'time' => $row['time'],
+                'distance' => $row['distance']
+            );
+        }
+        json_return(200, "Times Read Succeeded", $results);
+    }
+
 }
