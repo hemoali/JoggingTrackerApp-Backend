@@ -136,6 +136,24 @@ switch ($method) {
             } else {
                 json_return(400, "Bad Request", NULL);
             }
+        } elseif ($task == "delete_user") {
+            $user_id = trim($_POST['user_id']);
+            if (strlen($user_id) <= 0) {
+                json_return(400, "Bad Request", NULL);
+            } else {
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
+                    if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                        $main = new Main();
+                        $main->deleteUser($user_id);
+                    } else {
+                        json_return(400, "Bad Request", NULL);
+                    }
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            }
         } else {
             json_return(400, "Invalid Request", NULL);
         }
