@@ -10,18 +10,18 @@ class Main {
     public $conn;
 
     function __construct() {
-        $this->conn = pg_connect("host=".DB_HOST." dbname=".DB_NAME." user=".DB_USERNAME);
+        $this->conn = pg_connect("host=".DB_HOST." dbname=".DB_NAME." user=".DB_USERNAME, $this->conn);
         //$this->conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
         if (!$this->conn) {
-            json_return("200", "Database Error: ". pg_last_error(), NULL);
+            json_return("200", "Database Error: ". pg_last_error($this->conn), NULL);
         }
     }
 
     function register($email, $pass, $level) {
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $pass = mysqli_real_escape_string($this->conn, $pass);
-        $level = mysqli_real_escape_string($this->conn, $level);
-        $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
+        $email = pg_escape_string($email);
+        $pass = pg_escape_string($pass);
+        $level = pg_escape_string($level);
+        $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (mysqli_num_rows($query) <= 0) {
             $hash = getHashed($pass);
@@ -43,8 +43,8 @@ class Main {
     }
 
     function login($email, $pass) {
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $pass = mysqli_real_escape_string($this->conn, $pass);
+        $email = pg_escape_string($email);
+        $pass = pg_escape_string($pass);
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
         $query = pg_query($this->conn, $sql) or die(pg_last_error());
         if (pg_num_rows($query) > 0) {
