@@ -157,4 +157,15 @@ class Main {
         }
     }
 
+    public function deleteUser($user_id) {
+        $user_id = mysqli_real_escape_string($this->conn, $user_id);
+        $sql = "DELETE FROM `users` WHERE `_id` = '$user_id'";
+        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        if ($query) {
+            json_return(200, "User Delete Succeeded", NULL);
+        } else {
+            json_return(400, "Connot Find This User", NULL);
+        }
+    }
+
 }
