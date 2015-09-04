@@ -44,7 +44,7 @@ class Main {
         $email = pg_escape_string($this->conn, $email);
         $pass = pg_escape_string($this->conn, $pass);
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
-        $query = pg_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
         if (pg_num_rows($query) > 0) {
             $row = pg_fetch_assoc($query);
             if (password_verify($pass, $row['pass'])) {
@@ -65,9 +65,9 @@ class Main {
         $user_id = $_SESSION['user_id'];
         $results = array();
         $sql = "SELECT * FROM times WHERE user_id = '$user_id' ORDER BY _id DESC";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
 
-        while ($row = mysqli_fetch_array($query)) {
+        while ($row = pg_fetch_array($query)) {
             $results[] = array(
                 'id' => $row['_id'],
                 'user_id' => $row['user_id'],
@@ -82,9 +82,9 @@ class Main {
     function getTimesForAdmin($user_id) {
         $results = array();
         $sql = "SELECT * FROM times WHERE user_id = '$user_id' ORDER BY _id DESC";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
 
-        while ($row = mysqli_fetch_array($query)) {
+        while ($row = pg_fetch_array($query)) {
             $results[] = array(
                 'id' => $row['_id'],
                 'user_id' => $row['user_id'],
@@ -97,9 +97,9 @@ class Main {
     }
 
     public function deleteTime($time_id) {
-        $time_id = mysqli_real_escape_string($this->conn, $time_id);
+        $time_id = pg_escape_string($this->conn, $time_id);
         $sql = "DELETE FROM times WHERE _id = '$time_id'";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
         if ($query) {
             json_return(200, "Time Delete Succeeded", NULL);
         } else {
@@ -108,42 +108,42 @@ class Main {
     }
 
     public function addTime($date, $time, $distance) {
-        $date = mysqli_real_escape_string($this->conn, $date);
-        $time = mysqli_real_escape_string($this->conn, $time);
-        $distance = mysqli_real_escape_string($this->conn, $distance);
-        $user_id = mysqli_real_escape_string($this->conn, $_SESSION['user_id']);
-        $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance')";
-        $query = mysqli_query($this->conn, $sql);
+        $date = pg_escape_string($this->conn, $date);
+        $time = pg_escape_string($this->conn, $time);
+        $distance = pg_escape_string($this->conn, $distance);
+        $user_id = pg_escape_string($this->conn, $_SESSION['user_id']);
+        $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance') RETURNING _id;";
+        $query = pg_query($this->conn, $sql);
         if ($query) {
-            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
+            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => $query));
         } else {
             json_return(400, "Something Went Wrong", NULL);
         }
     }
 
     public function addTimeAdmin($date, $time, $distance, $user_id) {
-        $date = mysqli_real_escape_string($this->conn, $date);
-        $time = mysqli_real_escape_string($this->conn, $time);
-        $distance = mysqli_real_escape_string($this->conn, $distance);
-        $user_id = mysqli_real_escape_string($this->conn, $user_id);
-        $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance')";
-        $query = mysqli_query($this->conn, $sql);
+        $date = pg_escape_string($this->conn, $date);
+        $time = pg_escape_string($this->conn, $time);
+        $distance = pg_escape_string($this->conn, $distance);
+        $user_id = pg_escape_string($this->conn, $user_id);
+        $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance') RETURNING _id;";
+        $query = pg_query($this->conn, $sql);
         if ($query) {
-            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
+            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => $query));
         } else {
             json_return(400, "Something Went Wrong", NULL);
         }
     }
 
     public function editTime($date, $time, $distance, $time_id) {
-        $time_id = mysqli_real_escape_string($this->conn, $time_id);
-        $date = mysqli_real_escape_string($this->conn, $date);
-        $time = mysqli_real_escape_string($this->conn, $time);
-        $distance = mysqli_real_escape_string($this->conn, $distance);
-        $user_id = mysqli_real_escape_string($this->conn, $_SESSION['user_id']);
+        $time_id = pg_escape_string($this->conn, $time_id);
+        $date = pg_escape_string($this->conn, $date);
+        $time = pg_escape_string($this->conn, $time);
+        $distance = pg_escape_string($this->conn, $distance);
+        $user_id = pg_escape_string($this->conn, $_SESSION['user_id']);
 
         $sql = "UPDATE times SET time = '$time', date = '$date', distance = '$distance' WHERE _id = '$time_id'";
-        $query = mysqli_query($this->conn, $sql);
+        $query = pg_query($this->conn, $sql);
         if ($query) {
             json_return(200, "Record Update Succeeded", NULL);
         } else {
@@ -156,8 +156,8 @@ class Main {
 
         $results = array();
         $sql = "SELECT * FROM users WHERE _id != '$user_id' AND level = '2' ORDER BY _id DESC";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-        while ($row = mysqli_fetch_array($query)) {
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
+        while ($row = pg_fetch_array($query)) {
             $results[] = array(
                 'id' => $row['_id'],
                 'email' => $row['email'],
@@ -168,18 +168,18 @@ class Main {
     }
 
     public function addUser($email, $pass) {
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $pass = mysqli_real_escape_string($this->conn, $pass);
+        $email = pg_escape_string($this->conn, $email);
+        $pass = pg_escape_string($this->conn, $pass);
 
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-        if (mysqli_num_rows($query) <= 0) {
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
+        if (pg_num_rows($query) <= 0) {
             $hash = getHashed($pass);
             $api_key = getAPIKey();
-            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '2', '$api_key')";
-            $query = mysqli_query($this->conn, $sql);
+            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '2', '$api_key') RETURNING _id;";
+            $query = pg_query($this->conn, $sql);
             if ($query) {
-                json_return(200, "User Add Succeeded", array("_id" => mysqli_insert_id($this->conn)));
+                json_return(200, "User Add Succeeded", array("_id" => $query));
             } else {
                 json_return(400, "Something Went Wrong", NULL);
             }
@@ -189,9 +189,9 @@ class Main {
     }
 
     public function deleteUser($user_id) {
-        $user_id = mysqli_real_escape_string($this->conn, $user_id);
+        $user_id = pg_escape_string($this->conn, $user_id);
         $sql = "DELETE FROM users WHERE _id = '$user_id'";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
         if ($query) {
             json_return(200, "User Delete Succeeded", NULL);
         } else {
@@ -200,14 +200,14 @@ class Main {
     }
 
     public function editUser($email, $pass, $user_id, $level) {
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $pass = mysqli_real_escape_string($this->conn, $pass);
-        $user_id = mysqli_real_escape_string($this->conn, $user_id);
-        $level = mysqli_real_escape_string($this->conn, $level);
+        $email = pg_escape_string($this->conn, $email);
+        $pass = pg_escape_string($this->conn, $pass);
+        $user_id = pg_escape_string($this->conn, $user_id);
+        $level = pg_escape_string($this->conn, $level);
 
         $sql = "SELECT * FROM users WHERE email = '$email' AND _id != '$user_id' LIMIT 1";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-        if (mysqli_num_rows($query) <= 0) {
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
+        if (pg_num_rows($query) <= 0) {
 
             if (strlen($pass) > 0 && strlen($level) > 0) {
                 $hash = getHashed($pass);
@@ -220,7 +220,7 @@ class Main {
             } else {
                 $sql = "UPDATE users SET email = '$email' WHERE _id = '$user_id'";
             }
-            $query = mysqli_query($this->conn, $sql);
+            $query = pg_query($this->conn, $sql);
             if ($query) {
                 json_return(200, "User Update Succeeded", NULL);
             } else {
@@ -237,8 +237,8 @@ class Main {
 
             $results = array();
             $sql = "SELECT * FROM users WHERE _id != '$user_id' AND level != '0' ORDER BY _id DESC";
-            $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-            while ($row = mysqli_fetch_array($query)) {
+            $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
+            while ($row = pg_fetch_array($query)) {
                 $results[] = array(
                     'id' => $row['_id'],
                     'email' => $row['email'],
