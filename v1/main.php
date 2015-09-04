@@ -16,18 +16,18 @@ class Main {
     }
 
     function register($email, $pass, $level) {
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $pass = mysqli_real_escape_string($this->conn, $pass);
-        $level = mysqli_real_escape_string($this->conn, $level);
-        $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-        if (mysqli_num_rows($query) <= 0) {
+        $email = pg_escape_string($this->conn, $email);
+        $pass = pg_escape_string($this->conn, $pass);
+        $level = pg_escape_string($this->conn, $level);
+        $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
+        $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
+        if (pg_num_rows($query) <= 0) {
             $hash = getHashed($pass);
             $api_key = getAPIKey();
-            $sql = "INSERT INTO `users` (`email`, `pass`, `level`, `api_key`) VALUES ('$email', '$hash', '$level', '$api_key')";
-            $query = mysqli_query($this->conn, $sql);
+            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '$level', '$api_key') RETURNING id;";
+            $query = pg_query($this->conn, $sql);
             if ($query) {
-                $_SESSION['user_id'] = mysqli_insert_id($this->conn);
+                $_SESSION['user_id'] = $query;
                 $_SESSION['level'] = $level;
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $api_key;
@@ -47,14 +47,14 @@ class Main {
         $query = pg_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (pg_num_rows($query) > 0) {
             $row = pg_fetch_assoc($query);
-            if (password_verify($pass, $row[3])) {
-                $_SESSION['user_id'] = $row[0];
-                $_SESSION['level'] = $row[4];
+            if (password_verify($pass, $row['pass'])) {
+                $_SESSION['user_id'] = $row['_id'];
+                $_SESSION['level'] = $row['level'];
                 $_SESSION['email'] = $email;
-                $_SESSION['api_key'] = $row[1];
+                $_SESSION['api_key'] = $row['api_key'];
                 json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row[4], "api_key" => $row[1]));
             } else {
-                json_return(400, "Invalid Password". $row['pass'], NULL);
+                json_return(400, "Invalid Password", NULL);
             }
         } else {
             json_return(400, "Invalid Sign in Data", NULL);
@@ -64,7 +64,7 @@ class Main {
     function getTimes() {
         $user_id = $_SESSION['user_id'];
         $results = array();
-        $sql = "SELECT * FROM `times` WHERE `user_id` = '$user_id' ORDER BY `_id` DESC";
+        $sql = "SELECT * FROM times WHERE user_id = '$user_id' ORDER BY _id DESC";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
 
         while ($row = mysqli_fetch_array($query)) {
@@ -81,7 +81,7 @@ class Main {
 
     function getTimesForAdmin($user_id) {
         $results = array();
-        $sql = "SELECT * FROM `times` WHERE `user_id` = '$user_id' ORDER BY `_id` DESC";
+        $sql = "SELECT * FROM times WHERE user_id = '$user_id' ORDER BY _id DESC";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
 
         while ($row = mysqli_fetch_array($query)) {
@@ -98,7 +98,7 @@ class Main {
 
     public function deleteTime($time_id) {
         $time_id = mysqli_real_escape_string($this->conn, $time_id);
-        $sql = "DELETE FROM `times` WHERE `_id` = '$time_id'";
+        $sql = "DELETE FROM times WHERE _id = '$time_id'";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if ($query) {
             json_return(200, "Time Delete Succeeded", NULL);
@@ -112,7 +112,7 @@ class Main {
         $time = mysqli_real_escape_string($this->conn, $time);
         $distance = mysqli_real_escape_string($this->conn, $distance);
         $user_id = mysqli_real_escape_string($this->conn, $_SESSION['user_id']);
-        $sql = "INSERT INTO `times` (`user_id`, `date`, `time`, `distance`) VALUES ('$user_id', '$date', '$time', '$distance')";
+        $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance')";
         $query = mysqli_query($this->conn, $sql);
         if ($query) {
             json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
@@ -126,7 +126,7 @@ class Main {
         $time = mysqli_real_escape_string($this->conn, $time);
         $distance = mysqli_real_escape_string($this->conn, $distance);
         $user_id = mysqli_real_escape_string($this->conn, $user_id);
-        $sql = "INSERT INTO `times` (`user_id`, `date`, `time`, `distance`) VALUES ('$user_id', '$date', '$time', '$distance')";
+        $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance')";
         $query = mysqli_query($this->conn, $sql);
         if ($query) {
             json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => mysqli_insert_id($this->conn)));
@@ -142,7 +142,7 @@ class Main {
         $distance = mysqli_real_escape_string($this->conn, $distance);
         $user_id = mysqli_real_escape_string($this->conn, $_SESSION['user_id']);
 
-        $sql = "UPDATE `times` SET `time` = '$time', `date` = '$date', `distance` = '$distance' WHERE `_id` = '$time_id'";
+        $sql = "UPDATE times SET time = '$time', date = '$date', distance = '$distance' WHERE _id = '$time_id'";
         $query = mysqli_query($this->conn, $sql);
         if ($query) {
             json_return(200, "Record Update Succeeded", NULL);
@@ -155,7 +155,7 @@ class Main {
         $user_id = $_SESSION['user_id'];
 
         $results = array();
-        $sql = "SELECT * FROM `users` WHERE `_id` != '$user_id' AND `level` = '2' ORDER BY `_id` DESC";
+        $sql = "SELECT * FROM users WHERE _id != '$user_id' AND level = '2' ORDER BY _id DESC";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         while ($row = mysqli_fetch_array($query)) {
             $results[] = array(
@@ -171,12 +171,12 @@ class Main {
         $email = mysqli_real_escape_string($this->conn, $email);
         $pass = mysqli_real_escape_string($this->conn, $pass);
 
-        $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
+        $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (mysqli_num_rows($query) <= 0) {
             $hash = getHashed($pass);
             $api_key = getAPIKey();
-            $sql = "INSERT INTO `users` (`email`, `pass`, `level`, `api_key`) VALUES ('$email', '$hash', '2', '$api_key')";
+            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '2', '$api_key')";
             $query = mysqli_query($this->conn, $sql);
             if ($query) {
                 json_return(200, "User Add Succeeded", array("_id" => mysqli_insert_id($this->conn)));
@@ -190,7 +190,7 @@ class Main {
 
     public function deleteUser($user_id) {
         $user_id = mysqli_real_escape_string($this->conn, $user_id);
-        $sql = "DELETE FROM `users` WHERE `_id` = '$user_id'";
+        $sql = "DELETE FROM users WHERE _id = '$user_id'";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if ($query) {
             json_return(200, "User Delete Succeeded", NULL);
@@ -205,20 +205,20 @@ class Main {
         $user_id = mysqli_real_escape_string($this->conn, $user_id);
         $level = mysqli_real_escape_string($this->conn, $level);
 
-        $sql = "SELECT * FROM `users` WHERE `email` = '$email' AND `_id` != '$user_id' LIMIT 1";
+        $sql = "SELECT * FROM users WHERE email = '$email' AND _id != '$user_id' LIMIT 1";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (mysqli_num_rows($query) <= 0) {
 
             if (strlen($pass) > 0 && strlen($level) > 0) {
                 $hash = getHashed($pass);
-                $sql = "UPDATE `users` SET `email` = '$email', `pass` = '$hash', `level` = '$level' WHERE `_id` = '$user_id'";
+                $sql = "UPDATE users SET email = '$email', pass = '$hash', level = '$level' WHERE _id = '$user_id'";
             } elseif (strlen($pass) > 0) {
                 $hash = getHashed($pass);
-                $sql = "UPDATE `users` SET `email` = '$email', `pass` = '$hash' WHERE `_id` = '$user_id'";
+                $sql = "UPDATE users SET email = '$email', pass = '$hash' WHERE _id = '$user_id'";
             } elseif (strlen($level) > 0) {
-                $sql = "UPDATE `users` SET `email` = '$email', `level` = '$level' WHERE `_id` = '$user_id'";
+                $sql = "UPDATE users SET email = '$email', level = '$level' WHERE _id = '$user_id'";
             } else {
-                $sql = "UPDATE `users` SET `email` = '$email' WHERE `_id` = '$user_id'";
+                $sql = "UPDATE users SET email = '$email' WHERE _id = '$user_id'";
             }
             $query = mysqli_query($this->conn, $sql);
             if ($query) {
@@ -236,7 +236,7 @@ class Main {
             $user_id = $_SESSION['user_id'];
 
             $results = array();
-            $sql = "SELECT * FROM `users` WHERE `_id` != '$user_id' AND `level` != '0' ORDER BY `_id` DESC";
+            $sql = "SELECT * FROM users WHERE _id != '$user_id' AND level != '0' ORDER BY _id DESC";
             $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
             while ($row = mysqli_fetch_array($query)) {
                 $results[] = array(
