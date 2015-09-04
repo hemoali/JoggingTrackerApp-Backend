@@ -24,7 +24,7 @@ class Main {
         if (pg_num_rows($query) <= 0) {
             $hash = getHashed($pass);
             $api_key = getAPIKey();
-            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '$level', '$api_key') RETURNING id;";
+            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '$level', '$api_key') RETURNING _id;";
             $query = pg_query($this->conn, $sql);
             if ($query) {
                 $_SESSION['user_id'] = $query;
