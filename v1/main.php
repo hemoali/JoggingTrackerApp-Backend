@@ -44,7 +44,7 @@ class Main {
     function login($email, $pass) {
         $email = mysqli_real_escape_string($this->conn, $email);
         $pass = mysqli_real_escape_string($this->conn, $pass);
-        $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
+        $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
         $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (mysqli_num_rows($query) > 0) {
             $row = mysqli_fetch_assoc($query);
