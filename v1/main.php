@@ -10,9 +10,10 @@ class Main {
     public $conn;
 
     function __construct() {
-        $this->conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        if (mysqli_connect_errno()) {
-            json_return("200", "Database Error", NULL);
+        $this->conn = pg_connect("host=".DB_HOST." dbname=".DB_NAME." user=".DB_USERNAME);
+        //$this->conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
+        if (!$this->conn) {
+            json_return("200", "Database Error: ". pg_last_error(), NULL);
         }
     }
 
@@ -45,9 +46,9 @@ class Main {
         $email = mysqli_real_escape_string($this->conn, $email);
         $pass = mysqli_real_escape_string($this->conn, $pass);
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-        if (mysqli_num_rows($query) > 0) {
-            $row = mysqli_fetch_assoc($query);
+        $query = pg_query($this->conn, $sql) or die(pg_last_error());
+        if (pg_num_rows($query) > 0) {
+            $row = pg_fetch_assoc($query);
             if (password_verify($pass, $row['pass'])) {
                 $_SESSION['user_id'] = $row['_id'];
                 $_SESSION['level'] = $row['level'];
