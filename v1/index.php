@@ -7,8 +7,6 @@ require_once './main.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
-    case 'PUT':
-        break;
     case 'POST':
         $task = trim($_POST['task']);
         if ($task == "register") {
@@ -110,15 +108,39 @@ switch ($method) {
                     json_return(400, "Bad Request", NULL);
                 }
             }
+        } elseif ($task == "getUsers") {
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
+                if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                    $main = new Main();
+                    $main->getUsers();
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            } else {
+                json_return(400, "Bad Request", NULL);
+            }
+        } elseif ($task == "add_user") {
+            $email = trim($_POST['email']);
+            $pass = trim($_POST['pass']);
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
+                if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                    $main = new Main();
+                    $main->addUser($email, $pass);
+                } else {
+                    json_return(400, "Bad Request", NULL);
+                }
+            } else {
+                json_return(400, "Bad Request", NULL);
+            }
         } else {
             json_return(400, "Invalid Request", NULL);
         }
         break;
-    case 'GET':
-        break;
-    case 'DELETE':
 
-        break;
     default:
         json_return(400, "Invalid Request", NULL);
         break;
