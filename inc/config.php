@@ -16,6 +16,9 @@ set_error_handler("exception_error_handler");
 
 try {
  $db = @pg_connect(pg_connection_string());
+ if ($db){
+     echo "!";
+ }
 } Catch (Exception $e) {
     Echo $e->getMessage();
 }
