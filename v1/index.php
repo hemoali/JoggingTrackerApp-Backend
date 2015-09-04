@@ -101,7 +101,7 @@ switch ($method) {
                         json_return(400, "Bad Request2", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request3", NULL);
+                    json_return(400, "Bad Request3".$headers, NULL);
                 }
             }
         }elseif ($task == "add_time_admin") {
