@@ -1,12 +1,17 @@
 <?php
 
-    $headers = array();
+$headers = array();
 
-    foreach($_SERVER as $key => $value) {
-        if(strpos($key, 'HTTP_') === 0) {
+function getAuth() {
+    foreach ($_SERVER as $key => $value) {
+        if (strpos($key, 'HTTP_') === 0) {
             $headers = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
-            echo $headers." : ". $i[$headers] = $value . "<br>";
+            $headers . " : " . $i[$headers] = $value . "<br>";
+            if($headers == Authorization)
+                return $value;
         }
     }
+}
+echo getAuth();
 
 ?>
