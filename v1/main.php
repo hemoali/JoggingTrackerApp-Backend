@@ -47,7 +47,6 @@ class Main {
         $query = pg_query($this->conn, $sql) or die(mysqli_errno($this->conn));
         if (pg_num_rows($query) > 0) {
             $row = pg_fetch_assoc($query);
-            echo $row[3];
             if (password_verify($pass, $row[3])) {
                 $_SESSION['user_id'] = $row[0];
                 $_SESSION['level'] = $row[4];
@@ -55,7 +54,7 @@ class Main {
                 $_SESSION['api_key'] = $row[1];
                 json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row[4], "api_key" => $row[1]));
             } else {
-                json_return(400, "Invalid Password", NULL);
+                json_return(400, "Invalid Password". $row['pass'], NULL);
             }
         } else {
             json_return(400, "Invalid Sign in Data", NULL);
