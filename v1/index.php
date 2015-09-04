@@ -89,7 +89,7 @@ switch ($method) {
             $time = trim($_POST['time']);
             $distance = trim($_POST['distance']);
             if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0) {
-                json_return(400, "Bad Request", NULL);
+                json_return(400, "Bad Request1", NULL);
             } else {
                 $headers = apache_request_headers();
                 if (isset($headers['Authorization'])) {
@@ -98,10 +98,10 @@ switch ($method) {
                         $main = new Main();
                         $main->addTime($date, $time, $distance);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(400, "Bad Request2", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(400, "Bad Request3", NULL);
                 }
             }
         }elseif ($task == "add_time_admin") {
