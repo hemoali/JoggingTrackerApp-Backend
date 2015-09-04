@@ -4,8 +4,7 @@
     "monolog/monolog": "~1.7",
     "twig/twig": "^1.19",
     "symfony/twig-bridge": "^2.7”,
-    "php": "5.5.14",
-	"ext-mbstring": "*"
+    "php": "5.5.14"
   },
   "require-dev": {
     "heroku/heroku-buildpack-php": "*"
