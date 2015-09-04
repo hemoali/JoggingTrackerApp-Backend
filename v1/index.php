@@ -4,6 +4,7 @@ header("Content-Type:application/json");
 
 require_once './utils/Utils.php';
 require_once './main.php';
+
 $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'POST':
@@ -89,19 +90,19 @@ switch ($method) {
             $time = trim($_POST['time']);
             $distance = trim($_POST['distance']);
             if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0) {
-                json_return(400, "Bad Request1", NULL);
+                json_return(400, "Bad Request", NULL);
             } else {
-                $headers = request_headers();
+                $headers = apache_request_headers();
                 if (isset($headers['Authorization'])) {
                     $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->addTime($date, $time, $distance);
                     } else {
-                        json_return(400, "Bad Request2", NULL);
+                        json_return(400, "Bad Request", NULL);
                     }
                 } else {
-                    json_return(400, print_r($headers), NULL);
+                    json_return(400, "Bad Request", NULL);
                 }
             }
         }elseif ($task == "add_time_admin") {
