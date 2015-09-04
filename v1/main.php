@@ -10,8 +10,7 @@ class Main {
     public $conn;
 
     function __construct() {
-        $this->conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        if (mysqli_connect_errno()) {
+        if (!$this->conn = @pg_connect(pg_connection_string())){
             json_return("200", "Database Error", NULL);
         }
     }
@@ -42,18 +41,18 @@ class Main {
     }
 
     function login($email, $pass) {
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $pass = mysqli_real_escape_string($this->conn, $pass);
-        $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
-        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
-        if (mysqli_num_rows($query) > 0) {
-            $row = mysqli_fetch_assoc($query);
-            if (password_verify($pass, $row['pass'])) {
-                $_SESSION['user_id'] = $row['_id'];
-                $_SESSION['level'] = $row['level'];
+        $email = pg_escape_string($this->conn, $email);
+        $pass = pg_escape_string($this->conn, $pass);
+        $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
+        $query = pg_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        if (pg_num_rows($query) > 0) {
+            $row = pg_fetch_assoc($query);
+            if (password_verify($pass, $row[3])) {
+                $_SESSION['user_id'] = $row[0];
+                $_SESSION['level'] = $row[4];
                 $_SESSION['email'] = $email;
-                $_SESSION['api_key'] = $row['api_key'];
-                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key']));
+                $_SESSION['api_key'] = $row[1];
+                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row[4], "api_key" => $row[1]));
             } else {
                 json_return(400, "Invalid Password", NULL);
             }
