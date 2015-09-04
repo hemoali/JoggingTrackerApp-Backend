@@ -168,4 +168,30 @@ class Main {
         }
     }
 
+    public function editUser($email, $pass, $user_id) {
+        $email = mysqli_real_escape_string($this->conn, $email);
+        $pass = mysqli_real_escape_string($this->conn, $pass);
+        $user_id = mysqli_real_escape_string($this->conn, $user_id);
+
+        $sql = "SELECT * FROM `users` WHERE `email` = '$email' AND `_id` != '$user_id' LIMIT 1";
+        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        if (mysqli_num_rows($query) <= 0) {
+
+            if (strlen($pass) > 0) {
+                $hash = getHashed($pass);
+                $sql = "UPDATE `users` SET `email` = '$email', `pass` = '$hash' WHERE `_id` = '$user_id'";
+            } else {
+                $sql = "UPDATE `users` SET `email` = '$email' WHERE `_id` = '$user_id'";
+            }
+            $query = mysqli_query($this->conn, $sql);
+            if ($query) {
+                json_return(200, "User Update Succeeded", NULL);
+            } else {
+                json_return(400, "Something Went Wrong", NULL);
+            }
+        } else {
+            json_return(400, "User Already Exists", NULL);
+        }
+    }
+
 }
