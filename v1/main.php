@@ -121,4 +121,40 @@ class Main {
         }
     }
 
+    public function getUsers() {
+        $user_id = $_SESSION['user_id'];
+
+        $results = array();
+        $sql = "SELECT * FROM `users` WHERE `_id` != '$user_id' AND `level` = '2' ORDER BY `_id` DESC";
+        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        while ($row = mysqli_fetch_array($query)) {
+            $results[] = array(
+                'id' => $row['_id'],
+                'email' => $row['email']
+            );
+        }
+        json_return(200, "Users Read Succeeded", $results);
+    }
+
+    public function addUser($email, $pass) {
+        $email = mysqli_real_escape_string($this->conn, $email);
+        $pass = mysqli_real_escape_string($this->conn, $pass);
+
+        $sql = "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1";
+        $query = mysqli_query($this->conn, $sql) or die(mysqli_errno($this->conn));
+        if (mysqli_num_rows($query) <= 0) {
+            $hash = getHashed($pass);
+            $api_key = getAPIKey();
+            $sql = "INSERT INTO `users` (`email`, `pass`, `level`, `api_key`) VALUES ('$email', '$hash', '2', '$api_key')";
+            $query = mysqli_query($this->conn, $sql);
+            if ($query) {
+                json_return(200, "User Add Succeeded", array("_id" => mysqli_insert_id($this->conn)));
+            } else {
+                json_return(400, "Something Went Wrong", NULL);
+            }
+        } else {
+            json_return(200, "User Already Exists", NULL);
+        }
+    }
+
 }
