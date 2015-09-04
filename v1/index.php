@@ -91,7 +91,7 @@ switch ($method) {
             if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0) {
                 json_return(400, "Bad Request1", NULL);
             } else {
-                $headers = apache_request_headers();
+                $headers = request_headers();
                 if (isset($headers['Authorization'])) {
                     $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
