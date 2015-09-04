@@ -114,6 +114,7 @@ class Main {
         $user_id = pg_escape_string($this->conn, $_SESSION['user_id']);
         $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance') RETURNING _id;";
         $query = pg_query($this->conn, $sql);
+        echo "qqq ".$query;
         if ($query) {
             json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => $query));
         } else {
