@@ -10,7 +10,7 @@ class Main {
     public $conn;
 
     function __construct() {
-        if (!$this->conn = @pg_connect(pg_connection_string())){
+        if (!$this->conn = @pg_connect(pg_connection_string())) {
             json_return("200", "Database Error", NULL);
         }
     }
@@ -27,7 +27,9 @@ class Main {
             $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '$level', '$api_key') RETURNING _id;";
             $query = pg_query($this->conn, $sql);
             if ($query) {
-                $_SESSION['user_id'] = $query;
+                $insert_row = pg_fetch_row($query);
+                $insert_id = $insert_row[0];
+                $_SESSION['user_id'] = $insert_id;
                 $_SESSION['level'] = $level;
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $api_key;
@@ -114,7 +116,7 @@ class Main {
         $user_id = pg_escape_string($this->conn, $_SESSION['user_id']);
         $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance') RETURNING _id;";
         $query = pg_query($this->conn, $sql);
-        
+
         if ($query) {
             $insert_row = pg_fetch_row($query);
             $insert_id = $insert_row[0];
@@ -132,7 +134,9 @@ class Main {
         $sql = "INSERT INTO times (user_id, date, time, distance) VALUES ('$user_id', '$date', '$time', '$distance') RETURNING _id;";
         $query = pg_query($this->conn, $sql);
         if ($query) {
-            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => $query));
+            $insert_row = pg_fetch_row($query);
+            $insert_id = $insert_row[0];
+            json_return(200, "Record Add Succeeded", array("user_id" => $user_id, "_id" => $insert_id));
         } else {
             json_return(400, "Something Went Wrong", NULL);
         }
@@ -182,7 +186,9 @@ class Main {
             $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '2', '$api_key') RETURNING _id;";
             $query = pg_query($this->conn, $sql);
             if ($query) {
-                json_return(200, "User Add Succeeded", array("_id" => $query));
+                $insert_row = pg_fetch_row($query);
+                $insert_id = $insert_row[0];
+                json_return(200, "User Add Succeeded", array("_id" => $insert_id));
             } else {
                 json_return(400, "Something Went Wrong", NULL);
             }
