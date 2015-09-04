@@ -52,7 +52,7 @@ class Main {
                 $_SESSION['level'] = $row['level'];
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $row['api_key'];
-                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row[4], "api_key" => $row[1]));
+                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key']));
             } else {
                 json_return(400, "Invalid Password", NULL);
             }
