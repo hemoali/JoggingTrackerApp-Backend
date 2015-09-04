@@ -99,10 +99,10 @@ switch ($method) {
                         $main = new Main();
                         $main->addTime($date, $time, $distance);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(400, "Bad Request1", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(400, "Bad Request2", NULL);
                 }
             }
         }elseif ($task == "add_time_admin") {
