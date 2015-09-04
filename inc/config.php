@@ -9,10 +9,13 @@ define('DB_NAME', 'joggingtrackerapp');
 function pg_connection_string() {
   return "dbname=ddb3o0hq7ptq24 host=localhost port=5432 user=qubbbwkggkouoo password=CnxAIHPqUGyOwbhoFfbkVNWhd1 sslmode=require";
 }
- $db = pg_connect(pg_connection_string());
-if (!$db) {
-    echo "!Database connection error.";
-    exit;
-}else{
-    echo "DONE";
+function exception_error_handler($errno, $errstr, $errfile, $errline ) {
+    throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+}
+set_error_handler("exception_error_handler");
+
+try {
+ $db = @pg_connect(pg_connection_string());
+} Catch (Exception $e) {
+    Echo $e->getMessage();
 }

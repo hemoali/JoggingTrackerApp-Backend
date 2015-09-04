@@ -4,7 +4,6 @@ header("Content-Type:application/json");
 
 require_once './utils/Utils.php';
 require_once './main.php';
-
 $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'POST':
