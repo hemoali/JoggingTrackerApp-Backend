@@ -1,3 +1,3 @@
 <?php
-
-echo 1;
+// send_notifications
+echo 123;
