@@ -174,16 +174,17 @@ class Main {
         json_return(200, "Users Read Succeeded", $results);
     }
 
-    public function addUser($email, $pass) {
+    public function addUser($email, $pass, $level) {
         $email = pg_escape_string($this->conn, $email);
         $pass = pg_escape_string($this->conn, $pass);
+        $level = pg_escape_string($this->conn, $level);
 
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
         $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
         if (pg_num_rows($query) <= 0) {
             $hash = getHashed($pass);
             $api_key = getAPIKey();
-            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '2', '$api_key') RETURNING _id;";
+            $sql = "INSERT INTO users (email, pass, level, api_key) VALUES ('$email', '$hash', '$level', '$api_key') RETURNING _id;";
             $query = pg_query($this->conn, $sql);
             if ($query) {
                 $insert_row = pg_fetch_row($query);

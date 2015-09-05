@@ -105,7 +105,7 @@ switch ($method) {
                     json_return(400, "Bad Request", NULL);
                 }
             }
-        }elseif ($task == "add_time_admin") {
+        } elseif ($task == "add_time_admin") {
             $date = trim($_POST['date']);
             $time = trim($_POST['time']);
             $distance = trim($_POST['distance']);
@@ -160,7 +160,7 @@ switch ($method) {
             } else {
                 json_return(400, "Bad Request", NULL);
             }
-        }elseif ($task == "getUsers_ForAdmins") {
+        } elseif ($task == "getUsers_ForAdmins") {
             //$headers = apache_request_headers();
             if (trim(getAuth()) != "") {
                 $auth_array = split(":", getAuth());
@@ -176,17 +176,22 @@ switch ($method) {
         } elseif ($task == "add_user") {
             $email = trim($_POST['email']);
             $pass = trim($_POST['pass']);
-            //$headers = apache_request_headers();
-            if (trim(getAuth()) != "") {
-                $auth_array = split(":", getAuth());
-                if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
-                    $main = new Main();
-                    $main->addUser($email, $pass);
+            $level = trim($_POST['level']);
+            if (strlen($email) <= 0 || strlen($pass) <= 0 || strlen($level) <= 0) {
+                json_return(400, "Bad Request", NULL);
+            } else {
+                //$headers = apache_request_headers();
+                if (trim(getAuth()) != "") {
+                    $auth_array = split(":", getAuth());
+                    if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                        $main = new Main();
+                        $main->addUser($email, $pass, $level);
+                    } else {
+                        json_return(400, "Bad Request", NULL);
+                    }
                 } else {
                     json_return(400, "Bad Request", NULL);
                 }
-            } else {
-                json_return(400, "Bad Request", NULL);
             }
         } elseif ($task == "delete_user") {
             $user_id = trim($_POST['user_id']);
