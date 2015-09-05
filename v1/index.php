@@ -44,10 +44,10 @@ switch ($method) {
                     $main = new Main();
                     $main->getTimes();
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(400, "Bad Request1 ".  getAuth(), NULL);
                 }
             } else {
-                json_return(400, "Bad Request", NULL);
+                json_return(400, "Bad Request2 ".  getAuth(), NULL);
             }
         } elseif ($task == "getTimes_ForAdmin") {
             $user_id = $_POST['user_id'];
