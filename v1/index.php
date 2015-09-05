@@ -4,7 +4,6 @@ header("Content-Type:application/json");
 
 require_once './utils/Utils.php';
 require_once './main.php';
-
 $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'POST':
@@ -37,9 +36,9 @@ switch ($method) {
                 }
             }
         } elseif ($task == "getTimes") {
-            //$headers = apache_request_headers();
-            if (trim(getAuth()) != "") {
-                $auth_array = split(":", getAuth());
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
                 if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                     $main = new Main();
                     $main->getTimes();
@@ -51,12 +50,12 @@ switch ($method) {
             }
         } elseif ($task == "getTimes_ForAdmin") {
             $user_id = $_POST['user_id'];
-            //$headers = apache_request_headers();
+            $headers = apache_request_headers();
             if (strlen($user_id) <= 0) {
                 json_return(400, "Bad Request", NULL);
             } else {
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->getTimesForAdmin($user_id);
@@ -72,9 +71,9 @@ switch ($method) {
             if (strlen($time_id) <= 0) {
                 json_return(400, "Bad Request", NULL);
             } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->deleteTime($time_id);
@@ -90,22 +89,22 @@ switch ($method) {
             $time = trim($_POST['time']);
             $distance = trim($_POST['distance']);
             if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0) {
-                json_return(400, "Bad Request", NULL);
+                json_return(400, "Bad Request1", NULL);
             } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                $headers = request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->addTime($date, $time, $distance);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(400, "Bad Request2", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(400, print_r($headers), NULL);
                 }
             }
-        } elseif ($task == "add_time_admin") {
+        }elseif ($task == "add_time_admin") {
             $date = trim($_POST['date']);
             $time = trim($_POST['time']);
             $distance = trim($_POST['distance']);
@@ -113,9 +112,9 @@ switch ($method) {
             if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0 || strlen($user_id) <= 0) {
                 json_return(400, "Bad Request", NULL);
             } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->addTimeAdmin($date, $time, $distance, $user_id);
@@ -134,9 +133,9 @@ switch ($method) {
             if (strlen($date) <= 0 || strlen($time) <= 0 || strlen($distance) <= 0 || strlen($time_id) <= 0) {
                 json_return(400, "Bad Request", NULL);
             } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->editTime($date, $time, $distance, $time_id);
@@ -148,9 +147,9 @@ switch ($method) {
                 }
             }
         } elseif ($task == "getUsers") {
-            //$headers = apache_request_headers();
-            if (trim(getAuth()) != "") {
-                $auth_array = split(":", getAuth());
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
                 if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                     $main = new Main();
                     $main->getUsers();
@@ -160,10 +159,10 @@ switch ($method) {
             } else {
                 json_return(400, "Bad Request", NULL);
             }
-        } elseif ($task == "getUsers_ForAdmins") {
-            //$headers = apache_request_headers();
-            if (trim(getAuth()) != "") {
-                $auth_array = split(":", getAuth());
+        }elseif ($task == "getUsers_ForAdmins") {
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
                 if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                     $main = new Main();
                     $main->getUsersForAdmins();
@@ -176,31 +175,26 @@ switch ($method) {
         } elseif ($task == "add_user") {
             $email = trim($_POST['email']);
             $pass = trim($_POST['pass']);
-            $level = trim($_POST['level']);
-            if (strlen($email) <= 0 || strlen($pass) <= 0 || strlen($level) <= 0) {
-                json_return(400, "Bad Request", NULL);
-            } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
-                    if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
-                        $main = new Main();
-                        $main->addUser($email, $pass, $level);
-                    } else {
-                        json_return(400, "Bad Request", NULL);
-                    }
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                $auth_array = split(":", $headers['Authorization']);
+                if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
+                    $main = new Main();
+                    $main->addUser($email, $pass);
                 } else {
                     json_return(400, "Bad Request", NULL);
                 }
+            } else {
+                json_return(400, "Bad Request", NULL);
             }
         } elseif ($task == "delete_user") {
             $user_id = trim($_POST['user_id']);
             if (strlen($user_id) <= 0) {
                 json_return(400, "Bad Request", NULL);
             } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->deleteUser($user_id);
@@ -219,9 +213,9 @@ switch ($method) {
             if (strlen($email) <= 0 || strlen($user_id) <= 0) {
                 json_return(400, "Bad Request", NULL);
             } else {
-                //$headers = apache_request_headers();
-                if (trim(getAuth()) != "") {
-                    $auth_array = split(":", getAuth());
+                $headers = apache_request_headers();
+                if (isset($headers['Authorization'])) {
+                    $auth_array = split(":", $headers['Authorization']);
                     if (trim($auth_array[0]) == session_id() && trim($auth_array[1]) == $_SESSION['api_key']) {
                         $main = new Main();
                         $main->editUser($email, $pass, $user_id, $level);
