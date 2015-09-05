@@ -28,11 +28,15 @@ class Main {
             $sql = "INSERT INTO `users` (`email`, `pass`, `level`, `api_key`) VALUES ('$email', '$hash', '$level', '$api_key')";
             $query = mysqli_query($this->conn, $sql);
             if ($query) {
+                $query2 = mysqli_query($this->conn, "SELECT * FROM `users` WHERE `email` = '$email' LIMIT 1") or die(mysqli_errno($this->conn));
+                $row2 = mysqli_fetch_assoc($query2);
+
                 $_SESSION['user_id'] = mysqli_insert_id($this->conn);
                 $_SESSION['level'] = $level;
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $api_key;
-                json_return(200, "Signup Succeeded", array("session_id" => session_id(), "api_key" => $api_key));
+
+                json_return(200, "Signup Succeeded", array("session_id" => session_id(), "api_key" => $api_key, "reg_date" => substr($row2['reg_date'], 0, 10)));
             } else {
                 json_return(400, "Something Went Wrong", NULL);
             }
@@ -53,7 +57,9 @@ class Main {
                 $_SESSION['level'] = $row['level'];
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $row['api_key'];
-                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key']));
+                $reg_date = substr($row['reg_date'], 0, 10);
+
+                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key'], "reg_date" => $reg_date));
             } else {
                 json_return(400, "Invalid Password", NULL);
             }
