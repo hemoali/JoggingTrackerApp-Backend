@@ -29,11 +29,12 @@ class Main {
             if ($query) {
                 $insert_row = pg_fetch_row($query);
                 $insert_id = $insert_row[0];
+                $insert_date = $insert_row[5];
                 $_SESSION['user_id'] = $insert_id;
                 $_SESSION['level'] = $level;
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $api_key;
-                json_return(200, "Signup Succeeded", array("session_id" => session_id(), "api_key" => $api_key));
+                json_return(200, "Signup Succeeded", array("session_id" => session_id(), "api_key" => $api_key, "reg_date" => $insert_date));
             } else {
                 json_return(400, "Something Went Wrong", NULL);
             }
@@ -54,7 +55,8 @@ class Main {
                 $_SESSION['level'] = $row['level'];
                 $_SESSION['email'] = $email;
                 $_SESSION['api_key'] = $row['api_key'];
-                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key']));
+                $reg_date = $row['reg_date'];
+                json_return(200, "Login Succeeded", array("session_id" => session_id(), "level" => $row['level'], "api_key" => $row['api_key'], "reg_date" => $reg_date));
             } else {
                 json_return(400, "Invalid Password", NULL);
             }
