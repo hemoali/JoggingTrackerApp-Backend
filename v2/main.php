@@ -16,7 +16,7 @@ class Main {
     }
 
     function register($email, $pass, $level) {
-        $email = pg_escape_string($this->conn, $email);
+        $email = pg_escape_string($this->conn, strtolower($email));
         $pass = pg_escape_string($this->conn, $pass);
         $level = pg_escape_string($this->conn, $level);
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
@@ -43,7 +43,7 @@ class Main {
     }
 
     function login($email, $pass) {
-        $email = pg_escape_string($this->conn, $email);
+        $email = pg_escape_string($this->conn, strtolower($email));
         $pass = pg_escape_string($this->conn, $pass);
         $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
         $query = pg_query($this->conn, $sql) or die(pg_last_error($this->conn));
