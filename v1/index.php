@@ -44,7 +44,7 @@ switch ($method) {
                     $main = new Main();
                     $main->getTimes();
                 } else {
-                    json_return(400, "Bad Request1 ".  getAuth(), NULL);
+                    json_return(400, "Bad Request1 ".  getAuth() . "   aaa   " . session_id() . "   aaa    " .  $_SESSION['api_key'], NULL);
                 }
             } else {
                 json_return(400, "Bad Request2 ".  getAuth(), NULL);
