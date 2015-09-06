@@ -44,10 +44,10 @@ switch ($method) {
                     $main = new Main();
                     $main->getTimes();
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             } else {
-                json_return(400, "Bad Request", NULL);
+                json_return(401, "Unauthorized Request", NULL);
             }
         } elseif ($task == "getTimes_ForAdmin") {
             $user_id = $_POST['user_id'];
@@ -61,10 +61,10 @@ switch ($method) {
                         $main = new Main();
                         $main->getTimesForAdmin($user_id);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "delete_time") {
@@ -79,10 +79,10 @@ switch ($method) {
                         $main = new Main();
                         $main->deleteTime($time_id);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "add_time") {
@@ -99,10 +99,10 @@ switch ($method) {
                         $main = new Main();
                         $main->addTime($date, $time, $distance);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "add_time_admin") {
@@ -120,10 +120,10 @@ switch ($method) {
                         $main = new Main();
                         $main->addTimeAdmin($date, $time, $distance, $user_id);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "edit_time") {
@@ -141,10 +141,10 @@ switch ($method) {
                         $main = new Main();
                         $main->editTime($date, $time, $distance, $time_id);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "getUsers") {
@@ -155,10 +155,10 @@ switch ($method) {
                     $main = new Main();
                     $main->getUsers();
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             } else {
-                json_return(400, "Bad Request", NULL);
+                json_return(401, "Unauthorized Request", NULL);
             }
         } elseif ($task == "getUsers_ForAdmins") {
             //$headers = apache_request_headers();
@@ -168,10 +168,10 @@ switch ($method) {
                     $main = new Main();
                     $main->getUsersForAdmins();
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             } else {
-                json_return(400, "Bad Request", NULL);
+                json_return(401, "Unauthorized Request", NULL);
             }
         } elseif ($task == "add_user") {
             $email = trim($_POST['email']);
@@ -187,10 +187,10 @@ switch ($method) {
                         $main = new Main();
                         $main->addUser($email, $pass, $level);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "delete_user") {
@@ -205,10 +205,10 @@ switch ($method) {
                         $main = new Main();
                         $main->deleteUser($user_id);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } elseif ($task == "edit_user") {
@@ -226,19 +226,19 @@ switch ($method) {
                         $main = new Main();
                         $main->editUser($email, $pass, $user_id, $level);
                     } else {
-                        json_return(400, "Bad Request", NULL);
+                        json_return(401, "Unauthorized Request", NULL);
                     }
                 } else {
-                    json_return(400, "Bad Request", NULL);
+                    json_return(401, "Unauthorized Request", NULL);
                 }
             }
         } else {
-            json_return(400, "Invalid Request", NULL);
+            json_return(404, "Not Found", NULL);
         }
         break;
 
     default:
-        json_return(400, "Invalid Request", NULL);
+            json_return(404, "Not Found", NULL);
         break;
 }
  
