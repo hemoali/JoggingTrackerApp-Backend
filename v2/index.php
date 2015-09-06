@@ -9,6 +9,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
     case 'POST':
         $task = trim($_POST['task']);
+        echo $task;
         if ($task == "register") {
             $email = trim($_POST['email']);
             $pass = trim($_POST['pass']);
