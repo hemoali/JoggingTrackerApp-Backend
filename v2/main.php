@@ -29,7 +29,7 @@ class Main {
             if ($query) {
                 $insert_row = pg_fetch_row($query);
                 $insert_id = $insert_row[0];
-                $insert_date = $insert_row[5];
+                $insert_date = $insert_row[1];
                 $_SESSION['user_id'] = $insert_id;
                 $_SESSION['level'] = $level;
                 $_SESSION['email'] = $email;
